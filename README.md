@@ -1,10 +1,9 @@
-# VSCode + rclone for Emory HGCC Cluster Access
+# VSCode locolization for Emory HGCC Cluster Access - Windows
 
-> **Complete guide for using VSCode with Emory HGCC HPC cluster via rclone SFTP mount**  
+> **A guide for using VSCode with Emory HGCC HPC cluster via rclone SFTP mount**  
 > Bypasses Remote-SSH restrictions with **near-zero server resource usage**
 
 **Author:** Yikai Dong (yikai.dong@emory.edu)  
-**Lab:** Dr. Joshua Weinstock Lab, Emory University  
 **Status:** ✅ Production-ready on Windows 11  
 
 **Performance:** Cached operations are instant (<100ms), matching or exceeding native server VSCode
@@ -27,13 +26,13 @@
 ## Why This Approach?
 
 **Zero Server Overhead:**  
-Unlike VSCode Remote-SSH (which runs vscode-server processes on the cluster), this solution uses **only standard SFTP** - the same protocol you'd use with FileZilla or WinSCP. The cluster sees you as a simple file transfer client with no additional CPU, memory, or process overhead.
+Unlike VSCode Remote-SSH (which runs vscode-server processes on the cluster), this solution uses **only standard SFTP** - the same protocol you'd use with FileZilla or WinSCP. The cluster sees you as a simple file transfer client with no additional CPU, memory, or process overhead that troubles the server.
 
 **Performance:**  
 After initial cache warming, folder navigation and file access are **instant** - often faster than native server VSCode due to local caching.
 
 **Compliance:**  
-Works within HPC cluster restrictions that prohibit Remote-SSH installations.
+Works within HPC cluster restrictions that prohibit Remote-SSH installations in IDE platform like vscode.
 
 ---
 
@@ -476,7 +475,7 @@ sbatch my_job.sh
 | Create file         | 0.123s     | Cached locally, uploads async |
 | Save file           | 0.002s     | |
 | Navigate file tree  | 31.5s      | ls -R used; large directory, slower than other ops |
-| Git status          | 0.058s     | (git repo has corrupt object; fix recommended) |
+| Git status          | 0.200s     | Clean repo, typical timing |
 
 ### Cache Statistics
 

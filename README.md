@@ -40,7 +40,7 @@ Works within HPC cluster restrictions that prohibit Remote-SSH installations.
 ## Prerequisites
 
 - **Windows 10/11** (64-bit)
-- **Admin access** for initial installation
+- **Admin access** for initial installation only on your own computer
 - **SSH access** to Emory HGCC cluster
 - **~100GB free disk space** for cache (adjustable)
 
@@ -316,21 +316,19 @@ File → Open Folder → Z:\projects\your_emory_id\YourProject
 
 ```json
 {
-  "files.watcherExclude": {
-    "**/.git/objects/**": true,
-    "**/__pycache__/**": true,
-    "**/data/**": true,
-    "**/results/**": true
-  },
-  
-  "search.followSymlinks": false,
-  "git.autorefresh": false,
-  "python.analysis.indexing": false,
-  "files.autoSave": "off",
-  
-  "github.copilot.enable": {
-    "*": true
-  }
+   "files.watcherExclude": {
+      "**/.git/objects/**": true,
+      "**/__pycache__/**": true,
+      "**/data/**": true,
+      "**/results/**": true
+   },
+   "search.followSymlinks": false,
+   "git.autorefresh": false,
+   "python.analysis.indexing": false,
+   "files.autoSave": "off",
+   "github.copilot.enable": {
+      "*": true
+   }
 }
 ```
 
@@ -350,6 +348,16 @@ File → Open Folder → Z:\projects\your_emory_id\YourProject
 ```
 Ctrl+Shift+P → "Developer: Reload Window"
 ```
+
+---
+
+## Small Tip: Path Separator in VSCode
+
+Some users may notice that when you right-click a folder or file, the menu for "Copy Path" will show backslashes (\\) instead of forward slashes (/). To change this:
+
+1. Open local user settings (Ctrl+,)
+2. Search for "Explorer: Copy Path Separator" and "Explorer: Copy Relative Path Separator"
+3. Adjust them to be "/" for consistency with Unix-style paths.
 
 ---
 

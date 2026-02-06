@@ -234,30 +234,4 @@ Check Windows:
 
 ---
 
-## 中文快速指南
 
-### 挂载并预热缓存
-```cmd
-REM 1. 挂载驱动器（带30天永久缓存）
-mount-hgcc-permanent-cache.bat
-
-REM 2. 预热缓存（首次运行后，文件夹打开只需1-2秒）
-prewarm-cache.ps1
-```
-
-### 检查缓存状态
-```powershell
-REM 查看缓存大小
-(Get-ChildItem C:\rclone-cache\hgcc -Recurse -File | Measure-Object -Property Length -Sum).Sum / 1GB
-```
-
-### 清理旧缓存
-```powershell
-REM 删除30天前的缓存
-$threshold = (Get-Date).AddDays(-30)
-Get-ChildItem C:\rclone-cache\hgcc -Recurse -File | Where-Object { $_.LastAccessTime -lt $threshold } | Remove-Item -Force
-```
-
----
-
-**Questions?** Check the full guide: `rclone-permanent-cache-guide.md`

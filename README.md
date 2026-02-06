@@ -6,7 +6,21 @@
 **Author:** Yikai Dong (yikai.dong@emory.edu)  
 **Lab:** Dr. Joshua Weinstock Lab, Emory University  
 **Status:** ✅ Production-ready on Windows 11  
+
 **Performance:** Cached operations are instant (<100ms), matching or exceeding native server VSCode
+
+---
+
+### Real-World Performance (After Cache Warming)
+> **Note:** All performance tests below were run on my computer with a 2070 Super (an older CPU).
+
+| Operation           | Real Time   | Notes |
+|---------------------|------------|-------|
+| Open cached folder  | 0.046s     | Faster than server VSCode |
+| Create file         | 0.123s     | Cached locally, uploads async |
+| Save file           | 0.002s     | |
+| Git status          | 0.058s     | (git repo has corrupt object; fix recommended) |
+---
 
 ---
 
@@ -40,9 +54,9 @@ Works within HPC cluster restrictions that prohibit Remote-SSH installations.
 ## Prerequisites
 
 - **Windows 10/11** (64-bit)
-- **Admin access** for initial installation only on your own computer
 - **SSH access** to Emory HGCC cluster
-- **~100GB free disk space** for cache (adjustable)
+- **5~100GB free disk space** for cache (adjustable)
+> **Reminder:** Be sure to change all example paths to your own folders. For instance, update the mount-hgcc-permanent-cache.bat file to point to your project directory.
 
 ---
 
@@ -454,19 +468,20 @@ sbatch my_job.sh
 ## Performance Notes
 
 ### After Cache Warming
+> **Note:** All performance tests below were run on my computer with a 2070 Super (an older CPU).
 
-| Operation | Speed | Notes |
-|-----------|-------|-------|
-| Open cached folder | **Instant (<0.1s)** | Faster than server VSCode |
-| Create file | 1-2s | Cached locally, uploads async |
-| Save file | 1-2s | |
-| Navigate file tree | **Instant** | All cached |
-| Git status | 2-3s | |
+| Operation           | Real Time   | Notes |
+|---------------------|------------|-------|
+| Open cached folder  | 0.046s     | Faster than server VSCode |
+| Create file         | 0.123s     | Cached locally, uploads async |
+| Save file           | 0.002s     | |
+| Navigate file tree  | 31.5s      | ls -R used; large directory, slower than other ops |
+| Git status          | 0.058s     | (git repo has corrupt object; fix recommended) |
 
 ### Cache Statistics
 
 - **First-time setup:** 5-30 minutes (run prewarm-cache.sh once)
-- **Typical cache size:** 10-30GB
+- **Typical cache size:** 2-100GB
 - **Cache hit rate:** >99% after warming
 - **Server resource usage:** Near-zero (standard SFTP only)
 

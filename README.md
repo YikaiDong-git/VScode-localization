@@ -560,4 +560,4 @@ Email: yikai.dong@emory.edu
 
 ## License
 
-This guide is shared freely for use by Emory University researchers and the broader academic community.
+This guide is shared freely for use by Emory University researchers and the broader academic community under MIT License.

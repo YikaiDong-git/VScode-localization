@@ -87,6 +87,7 @@ WinFsp provides the FUSE-like filesystem layer needed for rclone mount on Window
    ```
    https://downloads.rclone.org/rclone-current-windows-amd64.zip
    ```
+   > **Note:** If your computer uses a different architecture or OS, check https://rclone.org/downloads/ for other versions.
 
 2. Extract to a permanent location:
    ```powershell

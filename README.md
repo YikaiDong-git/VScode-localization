@@ -60,16 +60,18 @@ Works within HPC cluster restrictions that prohibit Remote-SSH installations in 
 ---
 
 ## Installation
-
 ### Step 1: Install WinFsp
 
 WinFsp provides the FUSE-like filesystem layer needed for rclone mount on Windows.
 
-1. Download **WinFsp 2.0.23075**:
+1. For simplicity, open a **Administrator PowerShell** in your computer and then enter: 
+   ```
+   winget install WinFsp.WinFsp
+   ```
+   Or, download **WinFsp 2.0.23075** through https:
    ```
    https://github.com/winfsp/winfsp/releases/download/v2.0/winfsp-2.0.23075.msi
    ```
-
 2. Run the installer:
    - Accept all defaults
    - **Important:** Install both Core and Developer components
@@ -83,26 +85,41 @@ WinFsp provides the FUSE-like filesystem layer needed for rclone mount on Window
 
 ### Step 2: Install rclone
 
-1. Download the latest Windows release:
+> You may first run this command in your 'powershell' to get the exact version.
+   ```
+   Write-Host "OS: $((Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion').ProductName) | Arch: $env:PROCESSOR_ARCHITECTURE"
+   ```
+
+1. For simplicty, we recommend installing rclone via **Administrator PowerShell** too:
+   ```
+   winget install Rclone.Rclone
+   ```
+   > **Note:**: You may need to restart your PowerShell window after Installation for the rclone command to be recognized globally.
+
+   Or, Download the latest Windows release:
    ```
    https://downloads.rclone.org/rclone-current-windows-amd64.zip
    ```
    > **Note:** If your computer uses a different architecture or OS, check https://rclone.org/downloads/ for other versions.
+   
 
-2. Extract to a permanent location:
+
+
+
+4. Extract to a permanent location:
    ```powershell
    # Example: Extract to C:\rclone
    Expand-Archive rclone-current-windows-amd64.zip -DestinationPath C:\
    Rename-Item C:\rclone-v* C:\rclone
    ```
 
-3. Add to PATH (PowerShell as Admin):
+5. Add to PATH (PowerShell as Admin):
    ```powershell
    $env:Path += ";C:\rclone"
    [Environment]::SetEnvironmentVariable("Path", $env:Path, "Machine")
    ```
 
-4. Verify installation:
+6. Verify installation:
    ```powershell
    rclone version
    ```
@@ -235,7 +252,7 @@ Should list directories without errors.
 
 ### Create Mount Script
 
-**On your local computer**, create file: `mount-hgcc-permanent-cache.bat`
+**On your local computer's desktop (or anywhere else)**, create file: `mount-hgcc-permanent-cache.bat`
 
 ```batch
 @echo off
@@ -314,19 +331,19 @@ dir Z:\projects\your_emory_id
 **DO THIS:**
 ```
 File → Open Folder → Z:\projects\your_emory_id\YourProject
+File → Open Folder → Z:\projects\your_emory_id (NOT RECOMMENDED if your folder contain many projects)
 ```
 
 **DON'T DO THIS:**
 ```
 ❌ File → Open Folder → Z:\
-❌ File → Open Folder → Z:\projects\your_emory_id
 ```
 
 **Why:** Opening the entire drive or multiple projects will cache hundreds of gigabytes of data from other users' directories. Open only your active working project.
 
 ### Create `.vscode/settings.json`
 
-**In your project folder** (`Z:\projects\your_emory_id\YourProject\.vscode\settings.json`):
+**In your project folder, or click vscode search bar overhead, push "F1", search and click "open user setting" in the search bar. This will open a json file. Please put these rules to the file** (`Z:\projects\your_emory_id\YourProject\.vscode\settings.json`):
 
 ```json
 {
@@ -362,6 +379,7 @@ File → Open Folder → Z:\projects\your_emory_id\YourProject
 ```
 Ctrl+Shift+P → "Developer: Reload Window"
 ```
+Or just close and reopen.
 
 ---
 

@@ -19,7 +19,7 @@
 | Open cached folder  | 0.046s     | Faster than server VSCode |
 | Create file         | 0.123s     | Cached locally, uploads async |
 | Save file           | 0.002s     | |
-| Git status          | 0.058s     | (git repo has corrupt object; fix recommended) |
+| Git status          | 0.200s     | Clean repo, typical timing |
 ---
 
 ---

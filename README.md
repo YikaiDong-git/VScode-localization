@@ -4,7 +4,6 @@
 > Bypasses Remote-SSH restrictions with **near-zero server resource usage**
 
 **Author:** Yikai Dong (yikai.dong@emory.edu)  
-**Status:** ✅ Production-ready on Windows 11  
 
 **Performance:** Cached operations are instant (<100ms), matching or exceeding native server VSCode
 

@@ -126,15 +126,18 @@ Get-ChildItem C:\rclone-cache\hgcc\vfs -Recurse -File |
 
 ### Problem: Files I deleted remotely still show up
 
-**This is normal!** Cache takes up to 1 hour to sync (based on `--poll-interval 1h`)
+**This is normal!** Cache sync depends on the mount's `--poll-interval` (this repo uses `--poll-interval 1m` for near-real-time updates).
 
-**Force immediate sync:**
+**Force immediate sync (example):**
 ```bash
-# In Git Bash, while mount is running
-rclone rc vfs/refresh recursive=true dir=/projects/ydon268
+# Refresh your entire directory tree
+rclone rc vfs/refresh dir=projects/ydon268 recursive=true
+
+# Refresh just one subdirectory (faster)
+rclone rc vfs/refresh dir=projects/ydon268/Project1_Centromere recursive=true
 ```
 
-Or just wait 1 hour - it will auto-sync.
+Or just wait — the mount will auto-sync according to its `--poll-interval`.
 
 ---
 

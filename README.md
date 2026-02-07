@@ -4,7 +4,7 @@
 > Bypasses Remote-SSH restrictions with **near-zero server resource usage**
 
 **Author:** Yikai Dong (yikai.dong@emory.edu)  
-
+**Status:** ✅ Tested on Windows 10/11  
 **Performance:** Cached operations are instant (<100ms), matching or exceeding native server VSCode
 
 ---
@@ -125,125 +125,77 @@ WinFsp provides the FUSE-like filesystem layer needed for rclone mount on Window
 
 ---
 
-## SSH Key Setup
+## Installation
 
-### Step 1: Generate SSH Key (if you don't have one)
+### Step 1: Install WinFsp
 
-**On your local computer (PowerShell):**
+WinFsp provides the FUSE-like filesystem layer needed for rclone mount on Windows.
 
-```powershell
-# Generate ED25519 key (recommended)
-ssh-keygen -t ed25519 -C "your.email@emory.edu"
+1. Download **WinFsp 2.0.23075**:
+1. For simplicity, open a **Administrator PowerShell** in your computer and then enter: 
+   ```
+   winget install WinFsp.WinFsp
+   ```
+   Or, download **WinFsp 2.0.23075** through https:
+   ```
+   https://github.com/winfsp/winfsp/releases/download/v2.0/winfsp-2.0.23075.msi
+   ```
 
-# Save to: C:\Users\YourUsername\.ssh\id_ed25519
-# Set a passphrase (optional but recommended)
-```
+2. Run the installer:
+   - Accept all defaults
+   - **Important:** Install both Core and Developer components
+   - Reboot if prompted
 
-### Step 2: Copy Public Key to HGCC
+3. Verify installation (PowerShell):
+   ```powershell
+   sc query winfsp
+   ```
+   Should show `STATE: 4 RUNNING`
 
-**On your local computer (PowerShell):**
+### Step 2: Install rclone
 
-```powershell
-# Display your public key
-Get-Content $env:USERPROFILE\.ssh\id_ed25519.pub
-```
+1. Download the latest Windows release:
+> You may first run this command in your 'powershell' to get the exact version.
+   ```
+   Write-Host "OS: $((Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion').ProductName) | Arch: $env:PROCESSOR_ARCHITECTURE"
+   ```
 
-**On HGCC server (SSH terminal):**
+1. For simplicty, we recommend installing rclone via **Administrator PowerShell** too:
+   ```
+   winget install Rclone.Rclone
+   ```
+   > **Note:**: You may need to restart your PowerShell window after Installation for the rclone command to be recognized globally.
 
-```bash
-# SSH into HGCC first
-ssh your_emory_id@hgcc.emory.edu
-# Example: ssh abc1234@hgcc.emory.edu (where abc1234 is your 7-digit Emory ID)
+   Or, Download the latest Windows release:
+   ```
+   https://downloads.rclone.org/rclone-current-windows-amd64.zip
+   ```
+   > **Note:** If your computer uses a different architecture or OS, check https://rclone.org/downloads/ for other versions.
+   
 
-# Add your public key
-mkdir -p ~/.ssh
-chmod 700 ~/.ssh
-nano ~/.ssh/authorized_keys
-# Paste your public key, save and exit (Ctrl+O, Enter, Ctrl+X)
 
-# Set permissions
-chmod 600 ~/.ssh/authorized_keys
-```
 
-### Step 3: Test SSH Connection
 
-**On your local computer (PowerShell):**
+2. Extract to a permanent location:
+4. Extract to a permanent location:
+   ```powershell
+   # Example: Extract to C:\rclone
+   Expand-Archive rclone-current-windows-amd64.zip -DestinationPath C:\
+   Rename-Item C:\rclone-v* C:\rclone
+   ```
 
-```powershell
-ssh -i $env:USERPROFILE\.ssh\id_ed25519 your_emory_id@hgcc.emory.edu
-```
+3. Add to PATH (PowerShell as Admin):
+5. Add to PATH (PowerShell as Admin):
+   ```powershell
+   $env:Path += ";C:\rclone"
+   [Environment]::SetEnvironmentVariable("Path", $env:Path, "Machine")
+   ```
 
-Should connect without password prompt.
-
----
-
-## rclone Configuration
-
-**Run on your local computer (PowerShell):**
-
-### Step 1: Create Base Configuration
-
-```powershell
-rclone config
-```
-
-Follow these prompts:
-
-```
-n) New remote
-name> hgcc
-Storage> sftp
-host> hgcc.emory.edu
-user> your_emory_id
-  (e.g., abc1234 - your 7-digit alpha-numeric Emory ID)
-port> [Press Enter - use default 22]
-pass> [Press Enter - using SSH keys]
-key_file> [Press Enter - will use ssh-agent]
-key_use_agent> true
-Edit advanced config? y
-```
-
-### Step 2: Configure Performance Settings
-
-**In the advanced config section:**
-
-```
-disable_hashcheck> true
-set_modtime> false
-chunk_size> 256K
-idle_timeout> 5m
-concurrency> 64
-```
-
-**All other options:** Press Enter to accept defaults
-
-### Step 3: Verify Configuration
-
-```powershell
-rclone config show hgcc
-```
-
-Should show:
-```ini
-[hgcc]
-type = sftp
-host = hgcc.emory.edu
-user = abc1234
-key_use_agent = true
-disable_hashcheck = true
-set_modtime = false
-chunk_size = 256Ki
-idle_timeout = 5m0s
-concurrency = 64
-```
-
-### Step 4: Test Connection
-
-```powershell
-rclone ls hgcc:/beegfs/labs/weinstocklab --max-depth 1
-```
-
-Should list directories without errors.
+4. Verify installation:
+6. Verify installation:
+   ```powershell
+   rclone version
+   ```
 
 ---
 
@@ -251,6 +203,7 @@ Should list directories without errors.
 
 ### Create Mount Script
 
+**On your local computer**, create file: `mount-hgcc-permanent-cache.bat`
 **On your local computer's desktop (or anywhere else)**, create file: `mount-hgcc-permanent-cache.bat`
 
 ```batch
@@ -293,32 +246,6 @@ echo Mount stopped at %TIME%
 pause
 ```
 
-**Key Flags:**
-
-| Flag | Purpose |
-|------|---------|
-| `--network-mode` | Windows recognizes as network drive |
-| `--vfs-cache-mode full` | Cache reads and writes locally |
-| `--vfs-cache-max-age 720h` | Keep files cached for 30 days |
-| `--dir-cache-time 168h` | Cache directory structure for 7 days |
-| `--links` | Handle symbolic links properly |
-| `--no-checksum` | Skip hash verification (major speed boost) |
-
-### Test Mount
-
-**On your local computer (PowerShell):**
-
-```powershell
-# Run the script (double-click or run in terminal)
-.\mount-hgcc-permanent-cache.bat
-
-# Leave this window open - closing it unmounts the drive
-
-# In another PowerShell window, verify
-Get-PSDrive Z
-dir Z:\projects\your_emory_id
-```
-
 ---
 
 ## VSCode Settings
@@ -326,8 +253,6 @@ dir Z:\projects\your_emory_id
 ### ⚠️ CRITICAL: Open ONLY Your Working Directory
 
 **On your local computer:**
-
-**DO THIS:**
 ```
 File → Open Folder → Z:\projects\your_emory_id\YourProject
 File → Open Folder → Z:\projects\your_emory_id (NOT RECOMMENDED if your folder contain many projects)
@@ -342,6 +267,7 @@ File → Open Folder → Z:\projects\your_emory_id (NOT RECOMMENDED if your fold
 
 ### Create `.vscode/settings.json`
 
+**In your project folder** (`Z:\projects\your_emory_id\YourProject\.vscode\settings.json`):
 **In your project folder, or click vscode search bar overhead, push "F1", search and click "open user setting" in the search bar. This will open a json file. Please put these rules to the file** (`Z:\projects\your_emory_id\YourProject\.vscode\settings.json`):
 
 ```json
@@ -359,17 +285,6 @@ File → Open Folder → Z:\projects\your_emory_id (NOT RECOMMENDED if your fold
    "github.copilot.enable": {
       "*": true
    }
-}
-```
-
-**Add your own exclusions:** If you have folders you will never look at (e.g., large datasets, archived results, external libraries), add them to `files.watcherExclude`. This prevents VSCode from continuously scanning them.
-
-**Example additions:**
-```json
-"files.watcherExclude": {
-  "**/old_experiments/**": true,
-  "**/reference_genomes/**": true,
-  "**/archived_2024/**": true
 }
 ```
 
@@ -443,21 +358,17 @@ bash prewarm-cache.sh
 ### Morning: Start Work
 
 **On your local computer:**
+```
+File → Open Folder → Z:\projects\your_emory_id\YourProject
+File → Open Folder → Z:\projects\your_emory_id (NOT RECOMMENDED if your folder contain many projects)
+```
 
-1. **Mount the cluster** (double-click `mount-hgcc-permanent-cache.bat`)
-   - A terminal window will open
-   - **Keep this window open** - don't close it
-   - You should see "The service rclone has been started"
+**DON'T DO THIS:**
+```
+❌ File → Open Folder → Z:\
+```
 
-2. **Open VSCode** to your specific project:
-   ```
-   File → Open Folder → Z:\projects\your_emory_id\YourProject
-   ```
-
-3. **Work normally:**
-   - Edit files → saves upload automatically after 2 seconds
-   - All folder navigation is instant (cached)
-   - Git operations work normally
+**Why:** Opening the entire drive or multiple projects will cache hundreds of gigabytes of data from other users' directories. Open only your active working project.
 
 ### During Day: Run Jobs
 
@@ -473,12 +384,17 @@ sbatch my_job.sh
 ### Evening: End Work
 
 **On your local computer:**
+```
+File → Open Folder → Z:\projects\your_emory_id\YourProject
+File → Open Folder → Z:\projects\your_emory_id (NOT RECOMMENDED if your folder contain many projects)
+```
 
-1. Save all files in VSCode
-2. Wait 5 seconds for final uploads
-3. Close the mount window (or press Ctrl+C)
+**DON'T DO THIS:**
+```
+❌ File → Open Folder → Z:\
+```
 
-**Cache persists!** Tomorrow's mount will be instant.
+**Why:** Opening the entire drive or multiple projects will cache hundreds of gigabytes of data from other users' directories. Open only your active working project.
 
 ---
 

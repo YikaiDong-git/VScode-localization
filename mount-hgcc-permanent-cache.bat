@@ -12,7 +12,7 @@ REM Create cache directory
 mkdir C:\rclone-cache\hgcc 2>nul
 
 REM Mount weinstocklab with 30-day cache and RC enabled
-rclone mount hgcc:/beegfs/labs/weinstocklab Z: ^
+rclone mount hgcc:/home/yourEmoryIDorPath Z: ^
   --network-mode ^
   --vfs-cache-mode full ^
   --cache-dir C:\rclone-cache\hgcc ^
